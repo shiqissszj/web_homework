@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <meta charset="UTF-8"/>
+    <meta http-equiv="X-UA-Compatible" content="IE=edge"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>理工电影</title>
+    <style>
+        table {
+            border-collapse: collapse;
+            width: 100%;
+            margin: 0 auto;
+            border: none;
+        }
+
+        td {
+            font-size: 16px;
+            text-align: center;
+            border-bottom: 1px solid #000;
+            width: 20%;
+        }
+
+        img {
+            width: 100px;
+        }
+
+        button {
+            padding: 10px;
+            margin: 10px;
+            background-color: #fff;
+            border: 1px solid #000;
+            font-size: 16px;
+            cursor: pointer;
+        }
+
+        a {
+            text-decoration: none;
+            color: inherit;
+        }
+
+        button a {
+            text-decoration: none;
+            color: inherit;
+        }
+    </style>
+    <script>
+        // 跳转到用户管理页面
+        function handleUserManagementClick() {
+            window.location.href = '/users/manage'; // 直接跳转到用户管理页面
+        }
+    </script>
+</head>
+<body>
+<h2>欢迎光临理工电影</h2>
+<!-- 影视管理按钮 -->
+<button><a href="moviesCenter.html">影视管理</a></button>
+<!-- 用户管理按钮 -->
+<button onclick="handleUserManagementClick()">用户管理</button>
+<br/><br/>
+<!-- 注册按钮 -->
+<a href="userRegister.html">注册</a>
+<div id="root"></div>
+</body>
+</html>

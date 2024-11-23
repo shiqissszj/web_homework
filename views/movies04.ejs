@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>编辑电影</title>
+    <link rel="stylesheet" href="/styles/style.css">
+</head>
+<body>
+<header>
+    <h1>编辑电影详情</h1>
+    <nav>
+        <a href="/moviesCenter.html" class="back-button">返回电影列表</a>
+    </nav>
+</header>
+<main>
+    <section class="edit-movie-section">
+        <form action="/movies/update/<%= movie.id %>" method="POST">
+            <!-- 隐藏的电影 ID 字段 -->
+            <input type="hidden" name="id" value="<%= movie.id %>">
+
+            <!-- 电影编号 -->
+            <div class="form-group">
+                <label for="filmId">电影编号</label>
+                <input type="text" id="filmId" name="filmId" value="<%= movie.filmId %>" placeholder="请输入电影编号" required>
+            </div>
+
+            <!-- 电影名称 -->
+            <div class="form-group">
+                <label for="name">电影名称</label>
+                <input type="text" id="name" name="name" value="<%= movie.name %>" placeholder="请输入电影名称" required>
+            </div>
+
+            <!-- 电影简介 -->
+            <div class="form-group">
+                <label for="description">电影简介</label>
+                <textarea id="description" name="description" placeholder="请输入电影简介"><%= movie.description %></textarea>
+            </div>
+
+            <!-- 海报链接 -->
+            <div class="form-group">
+                <label for="posterUrl">海报链接</label>
+                <input type="text" id="posterUrl" name="posterUrl" value="<%= movie.posterUrl %>" placeholder="请输入海报链接">
+            </div>
+
+            <!-- 热度评分 -->
+            <div class="form-group">
+                <label for="popularity">热度评分</label>
+                <input type="number" id="popularity" name="popularity" value="<%= movie.popularity %>" placeholder="请输入热度评分">
+            </div>
+
+            <!-- 提交按钮 -->
+            <div class="form-group">
+                <button type="submit" class="save-button">保存修改</button>
+            </div>
+        </form>
+    </section>
+</main>
+</body>
+</html>

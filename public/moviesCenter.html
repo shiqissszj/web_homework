@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Movies Center</title>
+    <link rel="stylesheet" href="/styles/style.css">
+</head>
+<body>
+<header>
+    <h1 id="user-info">Welcome to the Movies Center</h1>
+    <div id="user-infoImg">
+        <img id="user-avatar" src="" alt="User Avatar" style="width: 50px; height: 50px;">
+        <span id="user-name"></span>
+    </div>
+    <nav>
+        <a href="/index.html" id="return-home">Return to Home</a>
+        <button id="logout-button" onclick="logout()">Logout</button>
+    </nav>
+</header>
+<main>
+    <section class="movie-gallery">
+        <h2>All Movies</h2>
+        <div class="gallery"></div>
+    </section>
+
+    <!-- 添加电影表单，默认隐藏，只有管理员可以看到 -->
+    <section id="add-movie" class="hidden">
+        <h2>Add New Movie</h2>
+        <form onsubmit="addMovie(event)">
+            <input type="text" name="filmId" placeholder="Film ID" required>
+            <input type="text" name="name" placeholder="Movie Name" required>
+            <textarea name="description" placeholder="Description"></textarea>
+            <input type="text" name="posterUrl" placeholder="Poster URL">
+            <input type="number" name="popularity" placeholder="Popularity">
+            <button type="submit">Add Movie</button>
+        </form>
+    </section>
+</main>
+<script>
+    let isAdmin = false;
+
+    // 加载用户信息
+    async function loadUserInfo() {
+        try {
+            const response = await fetch('/auth/current-user');
+            const result = await response.json();
+
+            if (result.code === 200) {
+                // 显示用户信息
+                document.getElementById('user-name').textContent = `Hello, ${result.user.name}`;
+                document.getElementById('user-avatar').src = result.user.imgUrl || '/images/default-avatar.png';
+
+                // 根据用户名判断是否为管理员
+                isAdmin = result.user.name === 'admin';
+
+                // 如果是管理员，显示“添加电影”表单
+                if (isAdmin) {
+                    document.getElementById('add-movie').classList.remove('hidden');
+                } else {
+                    // 如果不是管理员，隐藏“Return to Home”按钮
+                    const returnHomeButton = document.getElementById('return-home');
+                    returnHomeButton.style.display = 'none';
+                }
+            } else {
+                alert(result.msg || '无法获取用户信息，请重新登录！');
+                window.location.href = '/login.html';
+            }
+        } catch (error) {
+            console.error('Error loading user info:', error);
+            alert('服务器错误，请稍后重试！');
+            window.location.href = '/login.html';
+        }
+    }
+
+    // 加载所有电影
+    async function loadAllMovies() {
+        try {
+            const response = await fetch('/movies');
+            const movies = await response.json();
+
+            const gallery = document.querySelector('.gallery');
+            gallery.innerHTML = '';
+
+            movies.forEach(movie => {
+                const movieDiv = document.createElement('div');
+                movieDiv.className = 'movie';
+                movieDiv.innerHTML = `
+                    <img src="${movie.posterUrl || '/images/movies/default.jpg'}" alt="${movie.name}">
+                    <h3>${movie.name}</h3>
+                    <p>ID: ${movie.filmId}</p>
+                    <p>Popularity: ${movie.popularity || 'N/A'}</p>
+                    ${
+                    isAdmin
+                        ? `
+                            <button class="edit-btn" onclick="editMovie(${movie.id}, '${movie.filmId}', '${movie.name}', '${movie.description}', '${movie.posterUrl}', ${movie.popularity})">Edit</button>
+                            <button class="delete-btn" onclick="deleteMovie(${movie.id})">Delete</button>
+                        `
+                        : ''
+                }
+                `;
+                gallery.appendChild(movieDiv);
+            });
+        } catch (error) {
+            console.error('Error loading movies:', error);
+            alert('无法加载电影数据，请稍后重试！');
+        }
+    }
+
+    // 添加电影
+    async function addMovie(event) {
+        event.preventDefault();
+        const form = event.target;
+        const formData = new FormData(form);
+        const movieData = Object.fromEntries(formData.entries());
+
+        try {
+            const response = await fetch('/movies/add', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(movieData),
+            });
+
+            const result = await response.json();
+            if (response.ok) {
+                alert(result.msg || '电影添加成功！');
+                loadAllMovies();
+                form.reset();
+            } else {
+                alert(result.msg || '添加失败！');
+            }
+        } catch (error) {
+            console.error('Error adding movie:', error);
+            alert('服务器错误，请稍后重试！');
+        }
+    }
+
+    // 编辑电影
+    function editMovie(id, filmId, name, description, posterUrl, popularity) {
+        console.log('Edit button clicked. Movie ID:', id); // 调试信息
+        window.location.href = `/movies/edit/${id}`;
+    }
+
+    // 删除电影
+    async function deleteMovie(id) {
+        console.log('Delete button clicked. Movie ID:', id); // 调试信息
+        if (!confirm('Are you sure you want to delete this movie?')) return;
+
+        try {
+            const response = await fetch(`/movies/delete/${id}`, { method: 'DELETE' });
+            if (response.ok) {
+                alert('Movie deleted successfully!');
+                loadAllMovies(); // 重新加载电影列表
+            } else {
+                alert('Failed to delete movie!');
+            }
+        } catch (error) {
+            console.error('Error deleting movie:', error);
+            alert('服务器错误，请稍后重试！');
+        }
+    }
+
+    // 注销用户
+    async function logout() {
+        const response = await fetch('/auth/logout', { method: 'POST' });
+        if (response.ok) {
+            alert('Logged out successfully!');
+            window.location.href = '/login.html';
+        } else {
+            alert('Failed to log out!');
+        }
+    }
+
+    window.onload = () => {
+        loadUserInfo();
+        loadAllMovies();
+    };
+</script>
+</body>
+</html>

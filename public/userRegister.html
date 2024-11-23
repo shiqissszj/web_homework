@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>User Registration</title>
+    <link rel="stylesheet" href="/styles/style.css">
+    <script>
+        async function processRegistration(event) {
+            event.preventDefault(); // 阻止表单的默认提交行为
+            const registrationForm = event.target;
+
+            const formData = new FormData(registrationForm);
+            const payload = Object.fromEntries(formData.entries()); // 转换为 JSON 格式
+
+            try {
+                const response = await fetch('/auth/register', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload),
+                });
+
+                const result = await response.json();
+                if (response.status === 201) {
+                    alert(result.msg); // 成功提示
+                    registrationForm.reset(); // 重置表单
+                    window.location.href = '/login.html'; // 跳转至登录页面
+                } else {
+                    alert(result.msg || 'Registration unsuccessful.');
+                }
+            } catch (error) {
+                console.error('Error during registration:', error);
+                alert('Server error. Please try again later.');
+            }
+        }
+    </script>
+</head>
+<body>
+<header>
+    <h1>Create Your Account</h1>
+</header>
+<main>
+    <form onsubmit="processRegistration(event)">
+        <div class="form-field">
+            <label for="username">Your Name:</label>
+            <input type="text" id="username" name="username" placeholder="Enter your username" required>
+        </div>
+        <div class="form-field">
+            <label for="password">Password:</label>
+            <input type="password" id="password" name="password" placeholder="Enter your password" required>
+        </div>
+        <div class="form-field">
+            <label for="age">Your Age:</label>
+            <input type="number" id="age" name="age" min="1" max="120">
+        </div>
+        <div class="form-field">
+            <label for="gender">Select Gender:</label>
+            <select id="gender" name="gender">
+                <option value="">-- Choose --</option>
+                <option value="male">Male</option>
+                <option value="female">Female</option>
+                <option value="other">Other</option>
+            </select>
+        </div>
+        <div class="form-field">
+            <label for="address">Address:</label>
+            <input type="text" id="address" name="address">
+        </div>
+        <div class="form-field">
+            <label for="imgUrl">Profile Picture URL:</label>
+            <input type="url" id="imgUrl" name="imgUrl" placeholder="Enter a URL for your avatar">
+        </div>
+        <div class="form-field">
+            <button type="submit" class="submit-button">Sign Up</button>
+        </div>
+    </form>
+</main>
+</body>
+</html>
